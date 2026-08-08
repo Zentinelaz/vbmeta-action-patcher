@@ -6,7 +6,7 @@ on:
       ARCHITECTURE:
         description: 'Architecture'
         required: true
-        default: 'x86_64'
+        default: 'arm64-v8a'
         type: choice
         options:
         - x86_64
@@ -22,34 +22,30 @@ jobs:
     if: github.event.repository.owner.id == github.event.sender.id
     runs-on: ubuntu-latest
     steps:
- 
+
     - name: Check Out
       uses: actions/checkout@v3.1.0
-      
+
     - name: Operating System Information
       run: |
         uname -a
-        
-    - name: Patch File Information
+
+    - name: Give Permission and Run Patch
       run: |
-        file ${{ github.event.inputs.ARCHITECTURE }}/vbmeta-disable-verification
-        
-    - name: Give Permissio and Run Patch
-      run: |
-        chmod +x ${{ github.event.inputs.ARCHITECTURE }}/vbmeta-disable-verification
+        chmod -R +x .
         ./${{ github.event.inputs.ARCHITECTURE }}/vbmeta-disable-verification vbmeta.img
 
     - name: Upload to Release
       uses: ncipollo/release-action@v1.12.0
       with:
         artifacts: vbmeta.img
-        Name: Patched VBMeta
+        name: Patched VBMeta
         draft: false
         prerelease: true
         tag: ${{ github.run_id }}
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
-          Your vbmeta image are now ready!
+          Your vbmeta image is now ready!
           Flash it now.
 
     - name: Link to Release
